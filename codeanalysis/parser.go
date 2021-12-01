@@ -73,7 +73,15 @@ func (p *parser) Parse() SyntaxTree {
 }
 
 func (p *parser) parseExpression(parentPrecedence int) ExpressionSyntax {
-	left := p.parsePrimaryExpression()
+	var left ExpressionSyntax
+	unaryOperatorPrecedence := getUnaryOperatorPrecedence(p.current().kind)
+	if unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence {
+		operatorToken := p.nextToken()
+		operand := p.parseExpression(unaryOperatorPrecedence)
+		left = NewUnaryExpressionSyntax(operatorToken, operand)
+	} else {
+		left = p.parsePrimaryExpression()
+	}
 
 	for {
 		precedence := getBinaryOperatorPrecedence(p.current().kind)

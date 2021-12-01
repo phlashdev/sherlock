@@ -21,6 +21,19 @@ func (e *Evaluator) evaluateExpression(node ExpressionSyntax) int {
 		return n.literalToken.value.(int)
 	}
 
+	if u, ok := node.(*UnaryExpressionSyntax); ok {
+		operand := e.evaluateExpression(u.operand)
+
+		operatorToken := u.OperatorToken()
+		if operatorToken.Kind() == PlusToken {
+			return operand
+		} else if operatorToken.Kind() == MinusToken {
+			return -operand
+		} else {
+			panic(fmt.Sprintf("Unexcpected unary operator %v", operatorToken.Kind()))
+		}
+	}
+
 	if b, ok := node.(*BinaryExpressionSyntax); ok {
 		left := e.evaluateExpression(b.Left())
 		right := e.evaluateExpression(b.Right())
