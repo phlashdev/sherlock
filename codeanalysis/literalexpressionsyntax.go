@@ -9,7 +9,7 @@ func NewNumberExpressionSyntax(literalToken SyntaxToken) *LiteralExpressionSynta
 }
 
 func (n *LiteralExpressionSyntax) Kind() SyntaxKind {
-	return NumberExpression
+	return LiteralExpression
 }
 
 func (n *LiteralExpressionSyntax) LiteralToken() SyntaxToken {
