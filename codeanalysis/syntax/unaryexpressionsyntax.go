@@ -1,4 +1,4 @@
-package codeanalysis
+package syntax
 
 type UnaryExpressionSyntax struct {
 	operatorToken SyntaxToken

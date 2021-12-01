@@ -1,4 +1,4 @@
-package codeanalysis
+package syntax
 
 type LiteralExpressionSyntax struct {
 	literalToken SyntaxToken

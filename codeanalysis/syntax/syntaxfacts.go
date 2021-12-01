@@ -1,4 +1,4 @@
-package codeanalysis
+package syntax
 
 func getUnaryOperatorPrecedence(kind SyntaxKind) int {
 	switch kind {

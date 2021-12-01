@@ -1,4 +1,4 @@
-package codeanalysis
+package syntax
 
 type ParenthesizedExpressionSyntax struct {
 	openParenthesisToken  SyntaxToken

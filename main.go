@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/phlashdev/sherlock/codeanalysis"
+	"github.com/phlashdev/sherlock/codeanalysis/syntax"
 )
 
 type ConsoleColor string
@@ -44,7 +45,7 @@ func main() {
 			continue
 		}
 
-		syntaxTree := codeanalysis.Parse(line)
+		syntaxTree := syntax.Parse(line)
 
 		if showTree {
 			fmt.Print(ColorGray)
@@ -68,7 +69,7 @@ func main() {
 	}
 }
 
-func prettyPrint(node codeanalysis.SyntaxNode, indent string, isLast bool) {
+func prettyPrint(node syntax.SyntaxNode, indent string, isLast bool) {
 	var marker string
 	if isLast {
 		marker = "└── "
@@ -78,7 +79,7 @@ func prettyPrint(node codeanalysis.SyntaxNode, indent string, isLast bool) {
 
 	fmt.Printf("%s%s%v", indent, marker, node.Kind())
 
-	if t, ok := node.(*codeanalysis.SyntaxToken); ok && t.Value() != nil {
+	if t, ok := node.(*syntax.SyntaxToken); ok && t.Value() != nil {
 		fmt.Printf(" %v", t.Value())
 	}
 
