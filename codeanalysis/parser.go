@@ -67,43 +67,22 @@ func (p *parser) matchToken(kind SyntaxKind) SyntaxToken {
 }
 
 func (p *parser) Parse() SyntaxTree {
-	expression := p.parseExpression()
+	expression := p.parseExpression(0)
 	endOfFileToken := p.matchToken(EndOfFileToken)
 	return *NewSyntaxTree(p.diagnostics, expression, endOfFileToken)
 }
 
-func (p *parser) parseExpression() ExpressionSyntax {
-	return p.parseTerm()
-}
-
-func (p *parser) parseTerm() ExpressionSyntax {
-	left := p.parseFactor()
-
-	for {
-		current := p.current()
-		if !(current.Kind() == PlusToken || current.Kind() == MinusToken || current.Kind() == StarToken || current.Kind() == SlashToken) {
-			break
-		}
-
-		operatorToken := p.nextToken()
-		right := p.parseFactor()
-		left = NewBinaryExpressionSyntax(left, operatorToken, right)
-	}
-
-	return left
-}
-
-func (p *parser) parseFactor() ExpressionSyntax {
+func (p *parser) parseExpression(parentPrecedence int) ExpressionSyntax {
 	left := p.parsePrimaryExpression()
 
 	for {
-		current := p.current()
-		if !(current.Kind() == StarToken || current.Kind() == SlashToken) {
+		precedence := getBinaryOperatorPrecedence(p.current().kind)
+		if precedence == 0 || precedence <= parentPrecedence {
 			break
 		}
 
 		operatorToken := p.nextToken()
-		right := p.parsePrimaryExpression()
+		right := p.parseExpression(precedence)
 		left = NewBinaryExpressionSyntax(left, operatorToken, right)
 	}
 
@@ -113,11 +92,22 @@ func (p *parser) parseFactor() ExpressionSyntax {
 func (p *parser) parsePrimaryExpression() ExpressionSyntax {
 	if p.current().kind == OpenParenthesisToken {
 		left := p.nextToken()
-		expression := p.parseExpression()
+		expression := p.parseExpression(0)
 		right := p.matchToken(CloseParenthesisToken)
 		return NewParenthesizedExpressionSyntax(left, expression, right)
 	}
 
 	numberToken := p.matchToken(NumberToken)
 	return NewNumberExpressionSyntax(numberToken)
+}
+
+func getBinaryOperatorPrecedence(kind SyntaxKind) int {
+	switch kind {
+	case StarToken, SlashToken:
+		return 2
+	case PlusToken, MinusToken:
+		return 1
+	default:
+		return 0
+	}
 }
