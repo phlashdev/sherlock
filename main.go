@@ -4,7 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sc/codeanalysis"
+
+	"github.com/phlashdev/sherlock/codeanalysis"
 )
 
 type ConsoleColor string
