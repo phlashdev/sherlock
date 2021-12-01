@@ -17,8 +17,8 @@ func (e *Evaluator) Evaluate() int {
 }
 
 func (e *Evaluator) evaluateExpression(node ExpressionSyntax) int {
-	if n, ok := node.(*NumberExpressionSyntax); ok {
-		return n.numberToken.value.(int)
+	if n, ok := node.(*LiteralExpressionSyntax); ok {
+		return n.literalToken.value.(int)
 	}
 
 	if b, ok := node.(*BinaryExpressionSyntax); ok {

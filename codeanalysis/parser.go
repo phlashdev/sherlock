@@ -4,13 +4,13 @@ import (
 	"fmt"
 )
 
-type Parser struct {
+type parser struct {
 	tokens      []SyntaxToken
 	position    int
 	diagnostics []string
 }
 
-func NewParser(text string) *Parser {
+func NewParser(text string) *parser {
 	tokens := make([]SyntaxToken, 0, 10)
 
 	lexer := NewLexer(text)
@@ -26,18 +26,18 @@ func NewParser(text string) *Parser {
 		}
 	}
 
-	parser := Parser{
+	parser := parser{
 		tokens:      tokens,
 		diagnostics: lexer.Diagnostics(),
 	}
 	return &parser
 }
 
-func (p *Parser) Diagnostics() []string {
+func (p *parser) Diagnostics() []string {
 	return p.diagnostics
 }
 
-func (p *Parser) peek(offset int) SyntaxToken {
+func (p *parser) peek(offset int) SyntaxToken {
 	index := p.position + offset
 	if index >= len(p.tokens) {
 		return p.tokens[len(p.tokens)-1]
@@ -46,17 +46,17 @@ func (p *Parser) peek(offset int) SyntaxToken {
 	return p.tokens[index]
 }
 
-func (p *Parser) current() SyntaxToken {
+func (p *parser) current() SyntaxToken {
 	return p.peek(0)
 }
 
-func (p *Parser) nextToken() SyntaxToken {
+func (p *parser) nextToken() SyntaxToken {
 	current := p.current()
 	p.position++
 	return current
 }
 
-func (p *Parser) match(kind SyntaxKind) SyntaxToken {
+func (p *parser) matchToken(kind SyntaxKind) SyntaxToken {
 	current := p.current()
 	if current.Kind() == kind {
 		return p.nextToken()
@@ -66,17 +66,17 @@ func (p *Parser) match(kind SyntaxKind) SyntaxToken {
 	return *NewSyntaxToken(kind, current.Position(), "", nil)
 }
 
-func (p *Parser) parseExpression() ExpressionSyntax {
-	return p.parseTerm()
-}
-
-func (p *Parser) Parse() SyntaxTree {
-	expression := p.parseTerm()
-	endOfFileToken := p.match(EndOfFileToken)
+func (p *parser) Parse() SyntaxTree {
+	expression := p.parseExpression()
+	endOfFileToken := p.matchToken(EndOfFileToken)
 	return *NewSyntaxTree(p.diagnostics, expression, endOfFileToken)
 }
 
-func (p *Parser) parseTerm() ExpressionSyntax {
+func (p *parser) parseExpression() ExpressionSyntax {
+	return p.parseTerm()
+}
+
+func (p *parser) parseTerm() ExpressionSyntax {
 	left := p.parseFactor()
 
 	for {
@@ -93,7 +93,7 @@ func (p *Parser) parseTerm() ExpressionSyntax {
 	return left
 }
 
-func (p *Parser) parseFactor() ExpressionSyntax {
+func (p *parser) parseFactor() ExpressionSyntax {
 	left := p.parsePrimaryExpression()
 
 	for {
@@ -110,14 +110,14 @@ func (p *Parser) parseFactor() ExpressionSyntax {
 	return left
 }
 
-func (p *Parser) parsePrimaryExpression() ExpressionSyntax {
+func (p *parser) parsePrimaryExpression() ExpressionSyntax {
 	if p.current().kind == OpenParenthesisToken {
 		left := p.nextToken()
 		expression := p.parseExpression()
-		right := p.match(CloseParenthesisToken)
+		right := p.matchToken(CloseParenthesisToken)
 		return NewParenthesizedExpressionSyntax(left, expression, right)
 	}
 
-	numberToken := p.match(NumberToken)
+	numberToken := p.matchToken(NumberToken)
 	return NewNumberExpressionSyntax(numberToken)
 }

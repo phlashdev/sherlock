@@ -6,25 +6,25 @@ import (
 	"unicode"
 )
 
-type Lexer struct {
+type lexer struct {
 	text        string
 	runes       []rune
 	position    int
 	diagnostics []string
 }
 
-func NewLexer(text string) *Lexer {
-	return &Lexer{
+func NewLexer(text string) *lexer {
+	return &lexer{
 		text:  text,
 		runes: []rune(text),
 	}
 }
 
-func (l *Lexer) Diagnostics() []string {
+func (l *lexer) Diagnostics() []string {
 	return l.diagnostics
 }
 
-func (l *Lexer) current() rune {
+func (l *lexer) current() rune {
 	if l.position >= len(l.runes) {
 		return 0
 	}
@@ -32,11 +32,11 @@ func (l *Lexer) current() rune {
 	return l.runes[l.position]
 }
 
-func (l *Lexer) next() {
+func (l *lexer) next() {
 	l.position++
 }
 
-func (l *Lexer) NextToken() SyntaxToken {
+func (l *lexer) NextToken() SyntaxToken {
 	if l.position >= len(l.runes) {
 		return *NewSyntaxToken(EndOfFileToken, l.position, string(rune(0)), nil)
 	}
