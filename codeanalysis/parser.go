@@ -15,7 +15,7 @@ func NewParser(text string) *parser {
 
 	lexer := NewLexer(text)
 	for {
-		token := lexer.NextToken()
+		token := lexer.Lex()
 
 		if token.Kind() != WhitespaceToken && token.Kind() != BadToken {
 			tokens = append(tokens, token)

@@ -36,7 +36,7 @@ func (l *lexer) next() {
 	l.position++
 }
 
-func (l *lexer) NextToken() SyntaxToken {
+func (l *lexer) Lex() SyntaxToken {
 	if l.position >= len(l.runes) {
 		return *NewSyntaxToken(EndOfFileToken, l.position, string(rune(0)), nil)
 	}
@@ -67,37 +67,29 @@ func (l *lexer) NextToken() SyntaxToken {
 		return *NewSyntaxToken(WhitespaceToken, start, text, nil)
 	}
 
-	if l.current() == '+' {
-		token := *NewSyntaxToken(PlusToken, l.position, "+", nil)
-		l.next()
-		return token
-	} else if l.current() == '-' {
-		token := *NewSyntaxToken(MinusToken, l.position, "-", nil)
-		l.next()
-		return token
-	} else if l.current() == '*' {
-		token := *NewSyntaxToken(StarToken, l.position, "*", nil)
-		l.next()
-		return token
-	} else if l.current() == '/' {
-		token := *NewSyntaxToken(SlashToken, l.position, "/", nil)
-		l.next()
-		return token
-	} else if l.current() == '(' {
-		token := *NewSyntaxToken(OpenParenthesisToken, l.position, "(", nil)
-		l.next()
-		return token
-	} else if l.current() == ')' {
-		l.next()
-		token := *NewSyntaxToken(CloseParenthesisToken, l.position, ")", nil)
-		l.next()
-		return token
+	var token *SyntaxToken
+	switch l.current() {
+	case '+':
+		token = NewSyntaxToken(PlusToken, l.position, "+", nil)
+	case '-':
+		token = NewSyntaxToken(MinusToken, l.position, "-", nil)
+	case '*':
+		token = NewSyntaxToken(StarToken, l.position, "*", nil)
+	case '/':
+		token = NewSyntaxToken(SlashToken, l.position, "/", nil)
+	case '(':
+		token = NewSyntaxToken(OpenParenthesisToken, l.position, "(", nil)
+	case ')':
+		token = NewSyntaxToken(CloseParenthesisToken, l.position, ")", nil)
 	}
 
-	l.diagnostics = append(l.diagnostics, fmt.Sprintf("ERROR: bad character input: %q", l.current()))
+	if token == nil {
+		l.diagnostics = append(l.diagnostics, fmt.Sprintf("ERROR: bad character input: %q", l.current()))
 
-	text := string(l.runes[l.position])
-	token := *NewSyntaxToken(BadToken, l.position, text, nil)
+		text := string(l.runes[l.position])
+		token = NewSyntaxToken(BadToken, l.position, text, nil)
+	}
+
 	l.next()
-	return token
+	return *token
 }
