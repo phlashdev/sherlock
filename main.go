@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/phlashdev/sherlock/codeanalysis"
+	"github.com/phlashdev/sherlock/codeanalysis/binding"
 	"github.com/phlashdev/sherlock/codeanalysis/syntax"
 )
 
@@ -46,6 +47,10 @@ func main() {
 		}
 
 		syntaxTree := syntax.Parse(line)
+		binder := binding.NewBinder()
+		boundExpression := binder.BindExpression(syntaxTree.Root())
+
+		diagnostics := append(syntaxTree.Diagnostics(), binder.Diagnostics()...)
 
 		if showTree {
 			fmt.Print(ColorGray)
@@ -53,8 +58,8 @@ func main() {
 			fmt.Print(ColorReset)
 		}
 
-		if len(syntaxTree.Diagnostics()) == 0 {
-			e := codeanalysis.NewEvaluator(syntaxTree.Root())
+		if len(diagnostics) == 0 {
+			e := codeanalysis.NewEvaluator(boundExpression)
 			result := e.Evaluate()
 			fmt.Println(result)
 		} else {

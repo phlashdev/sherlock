@@ -3,14 +3,14 @@ package codeanalysis
 import (
 	"fmt"
 
-	"github.com/phlashdev/sherlock/codeanalysis/syntax"
+	"github.com/phlashdev/sherlock/codeanalysis/binding"
 )
 
 type Evaluator struct {
-	root syntax.ExpressionSyntax
+	root binding.BoundExpression
 }
 
-func NewEvaluator(root syntax.ExpressionSyntax) *Evaluator {
+func NewEvaluator(root binding.BoundExpression) *Evaluator {
 	return &Evaluator{root: root}
 }
 
@@ -18,45 +18,40 @@ func (e *Evaluator) Evaluate() int {
 	return e.evaluateExpression(e.root)
 }
 
-func (e *Evaluator) evaluateExpression(node syntax.ExpressionSyntax) int {
-	if n, ok := node.(*syntax.LiteralExpressionSyntax); ok {
-		token := n.LiteralToken()
-		return token.Value().(int)
+func (e *Evaluator) evaluateExpression(node binding.BoundExpression) int {
+	if n, ok := node.(*binding.BoundLiteralExpression); ok {
+		return n.Value().(int)
 	}
 
-	if u, ok := node.(*syntax.UnaryExpressionSyntax); ok {
+	if u, ok := node.(*binding.BoundUnaryExpression); ok {
 		operand := e.evaluateExpression(u.Operand())
 
-		operatorToken := u.OperatorToken()
-		if operatorToken.Kind() == syntax.PlusToken {
+		switch u.OperatorKind() {
+		case binding.Identity:
 			return operand
-		} else if operatorToken.Kind() == syntax.MinusToken {
+		case binding.Negation:
 			return -operand
-		} else {
-			panic(fmt.Sprintf("Unexcpected unary operator %v", operatorToken.Kind()))
+		default:
+			panic(fmt.Sprintf("Unexcpected unary operator %v", u.OperatorKind()))
 		}
 	}
 
-	if b, ok := node.(*syntax.BinaryExpressionSyntax); ok {
+	if b, ok := node.(*binding.BoundBinaryExpression); ok {
 		left := e.evaluateExpression(b.Left())
 		right := e.evaluateExpression(b.Right())
 
-		operatorToken := b.OperatorToken()
-		if operatorToken.Kind() == syntax.PlusToken {
+		switch b.OperatorKind() {
+		case binding.Addition:
 			return left + right
-		} else if operatorToken.Kind() == syntax.MinusToken {
+		case binding.Subtraction:
 			return left - right
-		} else if operatorToken.Kind() == syntax.StarToken {
+		case binding.Multiplication:
 			return left * right
-		} else if operatorToken.Kind() == syntax.SlashToken {
+		case binding.Division:
 			return left / right
-		} else {
-			panic(fmt.Sprintf("Unexcpected binary operator %v", operatorToken.Kind()))
+		default:
+			panic(fmt.Sprintf("Unexcpected binary operator %v", b.OperatorKind()))
 		}
-	}
-
-	if p, ok := node.(*syntax.ParenthesizedExpressionSyntax); ok {
-		return e.evaluateExpression(p.Expression())
 	}
 
 	panic(fmt.Sprintf("Unexcpected node %v", node.Kind()))
