@@ -98,13 +98,20 @@ func (p *parser) parseExpression(parentPrecedence int) ExpressionSyntax {
 }
 
 func (p *parser) parsePrimaryExpression() ExpressionSyntax {
-	if p.current().kind == OpenParenthesisToken {
+	currentKind := p.current().kind
+
+	switch currentKind {
+	case OpenParenthesisToken:
 		left := p.nextToken()
 		expression := p.parseExpression(0)
 		right := p.matchToken(CloseParenthesisToken)
 		return NewParenthesizedExpressionSyntax(left, expression, right)
+	case TrueKeyword, FalseKeyword:
+		keywordToken := p.nextToken()
+		value := currentKind == TrueKeyword
+		return NewLiteralExpressionSyntaxWithValue(keywordToken, value)
+	default:
+		numberToken := p.matchToken(NumberToken)
+		return NewLiteralExpressionSyntax(numberToken)
 	}
-
-	numberToken := p.matchToken(NumberToken)
-	return NewNumberExpressionSyntax(numberToken)
 }

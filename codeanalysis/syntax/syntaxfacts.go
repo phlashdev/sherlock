@@ -19,3 +19,14 @@ func getBinaryOperatorPrecedence(kind SyntaxKind) int {
 		return 0
 	}
 }
+
+func getKeywordKind(text string) SyntaxKind {
+	switch text {
+	case "true":
+		return TrueKeyword
+	case "false":
+		return FalseKeyword
+	default:
+		return IdentifierToken
+	}
+}

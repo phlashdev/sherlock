@@ -14,6 +14,13 @@ const (
 	SlashToken            SyntaxKind = "SlashToken"
 	OpenParenthesisToken  SyntaxKind = "OpenParenthesisToken"
 	CloseParenthesisToken SyntaxKind = "CloseParenthesisToken"
+	IdentifierToken       SyntaxKind = "IdentifierToken"
+)
+
+// Keywords
+const (
+	TrueKeyword  SyntaxKind = "TrueKeyword"
+	FalseKeyword SyntaxKind = "FalseKeyword"
 )
 
 // Expressions

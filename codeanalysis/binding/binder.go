@@ -36,11 +36,10 @@ func (b *binder) BindExpression(expressionSyntax syntax.ExpressionSyntax) BoundE
 }
 
 func (b *binder) bindLiteralExpression(expressionSyntax syntax.LiteralExpressionSyntax) BoundExpression {
-	token := expressionSyntax.LiteralToken()
-	if value, ok := token.Value().(int); ok {
-		return newBoundLiteralExpression(value)
+	if expressionSyntax.Value() == nil {
+		return newBoundLiteralExpression(0)
 	}
-	return newBoundLiteralExpression(0)
+	return newBoundLiteralExpression(expressionSyntax.Value())
 }
 
 func (b *binder) bindUnaryExpression(expressionSyntax syntax.UnaryExpressionSyntax) BoundExpression {

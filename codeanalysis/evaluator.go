@@ -14,17 +14,17 @@ func NewEvaluator(root binding.BoundExpression) *Evaluator {
 	return &Evaluator{root: root}
 }
 
-func (e *Evaluator) Evaluate() int {
+func (e *Evaluator) Evaluate() interface{} {
 	return e.evaluateExpression(e.root)
 }
 
-func (e *Evaluator) evaluateExpression(node binding.BoundExpression) int {
+func (e *Evaluator) evaluateExpression(node binding.BoundExpression) interface{} {
 	if n, ok := node.(*binding.BoundLiteralExpression); ok {
-		return n.Value().(int)
+		return n.Value()
 	}
 
 	if u, ok := node.(*binding.BoundUnaryExpression); ok {
-		operand := e.evaluateExpression(u.Operand())
+		operand := e.evaluateExpression(u.Operand()).(int)
 
 		switch u.OperatorKind() {
 		case binding.Identity:
@@ -37,8 +37,8 @@ func (e *Evaluator) evaluateExpression(node binding.BoundExpression) int {
 	}
 
 	if b, ok := node.(*binding.BoundBinaryExpression); ok {
-		left := e.evaluateExpression(b.Left())
-		right := e.evaluateExpression(b.Right())
+		left := e.evaluateExpression(b.Left()).(int)
+		right := e.evaluateExpression(b.Right()).(int)
 
 		switch b.OperatorKind() {
 		case binding.Addition:

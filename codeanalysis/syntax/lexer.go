@@ -67,6 +67,18 @@ func (l *lexer) Lex() SyntaxToken {
 		return *NewSyntaxToken(WhitespaceToken, start, text, nil)
 	}
 
+	if unicode.IsLetter(l.current()) {
+		start := l.position
+
+		for unicode.IsLetter(l.current()) {
+			l.next()
+		}
+
+		text := string(l.runes[start:l.position])
+		kind := getKeywordKind(text)
+		return *NewSyntaxToken(kind, start, text, nil)
+	}
+
 	var token *SyntaxToken
 	switch l.current() {
 	case '+':
