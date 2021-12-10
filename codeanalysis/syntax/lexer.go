@@ -25,11 +25,21 @@ func (l *lexer) Diagnostics() []string {
 }
 
 func (l *lexer) current() rune {
-	if l.position >= len(l.runes) {
+	return l.peek(0)
+}
+
+func (l *lexer) lookahead() rune {
+	return l.peek(1)
+}
+
+func (l *lexer) peek(offset int) rune {
+	index := l.position + offset
+
+	if index >= len(l.runes) {
 		return 0
 	}
 
-	return l.runes[l.position]
+	return l.runes[index]
 }
 
 func (l *lexer) next() {
@@ -93,6 +103,16 @@ func (l *lexer) Lex() SyntaxToken {
 		token = NewSyntaxToken(OpenParenthesisToken, l.position, "(", nil)
 	case ')':
 		token = NewSyntaxToken(CloseParenthesisToken, l.position, ")", nil)
+	case '!':
+		token = NewSyntaxToken(BangToken, l.position, "!", nil)
+	case '&':
+		if l.lookahead() == '&' {
+			token = NewSyntaxToken(AmpersandAmpersandToken, l.position, "&&", nil)
+		}
+	case '|':
+		if l.lookahead() == '|' {
+			token = NewSyntaxToken(PipePipeToken, l.position, "||", nil)
+		}
 	}
 
 	if token == nil {
@@ -102,6 +122,11 @@ func (l *lexer) Lex() SyntaxToken {
 		token = NewSyntaxToken(BadToken, l.position, text, nil)
 	}
 
-	l.next()
+	if token.kind == AmpersandAmpersandToken || token.kind == PipePipeToken {
+		l.position += 2
+	} else {
+		l.position++
+	}
+
 	return *token
 }

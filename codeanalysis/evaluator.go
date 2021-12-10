@@ -24,31 +24,37 @@ func (e *Evaluator) evaluateExpression(node binding.BoundExpression) interface{}
 	}
 
 	if u, ok := node.(*binding.BoundUnaryExpression); ok {
-		operand := e.evaluateExpression(u.Operand()).(int)
+		operand := e.evaluateExpression(u.Operand())
 
 		switch u.OperatorKind() {
 		case binding.Identity:
-			return operand
+			return operand.(int)
 		case binding.Negation:
-			return -operand
+			return -operand.(int)
+		case binding.LogicalNegation:
+			return !operand.(bool)
 		default:
 			panic(fmt.Sprintf("Unexcpected unary operator %v", u.OperatorKind()))
 		}
 	}
 
 	if b, ok := node.(*binding.BoundBinaryExpression); ok {
-		left := e.evaluateExpression(b.Left()).(int)
-		right := e.evaluateExpression(b.Right()).(int)
+		left := e.evaluateExpression(b.Left())
+		right := e.evaluateExpression(b.Right())
 
 		switch b.OperatorKind() {
 		case binding.Addition:
-			return left + right
+			return left.(int) + right.(int)
 		case binding.Subtraction:
-			return left - right
+			return left.(int) - right.(int)
 		case binding.Multiplication:
-			return left * right
+			return left.(int) * right.(int)
 		case binding.Division:
-			return left / right
+			return left.(int) / right.(int)
+		case binding.LogicalAnd:
+			return left.(bool) && right.(bool)
+		case binding.LogicalOr:
+			return left.(bool) || right.(bool)
 		default:
 			panic(fmt.Sprintf("Unexcpected binary operator %v", b.OperatorKind()))
 		}

@@ -72,35 +72,47 @@ func (b *binder) bindBinaryExpression(expressionSyntax syntax.BinaryExpressionSy
 }
 
 func bindUnaryOperatorKind(kind syntax.SyntaxKind, operandType reflect.Type) boundUnaryOperatorKind {
-	if operandType.Kind() != reflect.Int {
-		return UnknownUnaryOperator
+	if operandType.Kind() == reflect.Int {
+		switch kind {
+		case syntax.PlusToken:
+			return Identity
+		case syntax.MinusToken:
+			return Negation
+		}
 	}
 
-	switch kind {
-	case syntax.PlusToken:
-		return Identity
-	case syntax.MinusToken:
-		return Negation
-	default:
-		panic(fmt.Sprintf("Unexpected unary operator %v", kind))
+	if operandType.Kind() == reflect.Bool {
+		switch kind {
+		case syntax.BangToken:
+			return LogicalNegation
+		}
 	}
+
+	return UnknownUnaryOperator
 }
 
 func bindBinaryOperatorKind(kind syntax.SyntaxKind, leftType reflect.Type, rightType reflect.Type) boundBinaryOperatorKind {
-	if leftType.Kind() != reflect.Int || rightType.Kind() != reflect.Int {
-		return UnknownBinaryOperator
+	if leftType.Kind() == reflect.Int && rightType.Kind() == reflect.Int {
+		switch kind {
+		case syntax.PlusToken:
+			return Addition
+		case syntax.MinusToken:
+			return Subtraction
+		case syntax.StarToken:
+			return Multiplication
+		case syntax.SlashToken:
+			return Division
+		}
 	}
 
-	switch kind {
-	case syntax.PlusToken:
-		return Addition
-	case syntax.MinusToken:
-		return Subtraction
-	case syntax.StarToken:
-		return Multiplication
-	case syntax.SlashToken:
-		return Division
-	default:
-		panic(fmt.Sprintf("Unexpected binary operator %v", kind))
+	if leftType.Kind() == reflect.Bool && rightType.Kind() == reflect.Bool {
+		switch kind {
+		case syntax.AmpersandAmpersandToken:
+			return LogicalAnd
+		case syntax.PipePipeToken:
+			return LogicalOr
+		}
 	}
+
+	return UnknownBinaryOperator
 }

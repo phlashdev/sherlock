@@ -108,7 +108,7 @@ func (p *parser) parsePrimaryExpression() ExpressionSyntax {
 		return NewParenthesizedExpressionSyntax(left, expression, right)
 	case TrueKeyword, FalseKeyword:
 		keywordToken := p.nextToken()
-		value := currentKind == TrueKeyword
+		value := keywordToken.Kind() == TrueKeyword
 		return NewLiteralExpressionSyntaxWithValue(keywordToken, value)
 	default:
 		numberToken := p.matchToken(NumberToken)
