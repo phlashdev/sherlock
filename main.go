@@ -65,7 +65,7 @@ func main() {
 		} else {
 			fmt.Print(ColorRed)
 
-			for _, diagnostic := range syntaxTree.Diagnostics() {
+			for _, diagnostic := range diagnostics {
 				fmt.Println(diagnostic)
 			}
 
