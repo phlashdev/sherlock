@@ -25,8 +25,9 @@ func (e *Evaluator) evaluateExpression(node binding.BoundExpression) interface{}
 
 	if u, ok := node.(*binding.BoundUnaryExpression); ok {
 		operand := e.evaluateExpression(u.Operand())
+		op := u.Op()
 
-		switch u.OperatorKind() {
+		switch op.Kind() {
 		case binding.Identity:
 			return operand.(int)
 		case binding.Negation:
@@ -34,15 +35,16 @@ func (e *Evaluator) evaluateExpression(node binding.BoundExpression) interface{}
 		case binding.LogicalNegation:
 			return !operand.(bool)
 		default:
-			panic(fmt.Sprintf("Unexcpected unary operator %v", u.OperatorKind()))
+			panic(fmt.Sprintf("Unexcpected unary operator %v", op))
 		}
 	}
 
 	if b, ok := node.(*binding.BoundBinaryExpression); ok {
 		left := e.evaluateExpression(b.Left())
 		right := e.evaluateExpression(b.Right())
+		op := b.Op()
 
-		switch b.OperatorKind() {
+		switch op.Kind() {
 		case binding.Addition:
 			return left.(int) + right.(int)
 		case binding.Subtraction:
@@ -56,7 +58,7 @@ func (e *Evaluator) evaluateExpression(node binding.BoundExpression) interface{}
 		case binding.LogicalOr:
 			return left.(bool) || right.(bool)
 		default:
-			panic(fmt.Sprintf("Unexcpected binary operator %v", b.OperatorKind()))
+			panic(fmt.Sprintf("Unexcpected binary operator %v", op))
 		}
 	}
 

@@ -5,14 +5,14 @@ import (
 )
 
 type BoundUnaryExpression struct {
-	operatorKind boundUnaryOperatorKind
-	operand      BoundExpression
+	op      boundUnaryOperator
+	operand BoundExpression
 }
 
-func newBoundUnaryExpression(operatorKind boundUnaryOperatorKind, operand BoundExpression) *BoundUnaryExpression {
+func newBoundUnaryExpression(op boundUnaryOperator, operand BoundExpression) *BoundUnaryExpression {
 	return &BoundUnaryExpression{
-		operatorKind: operatorKind,
-		operand:      operand,
+		op:      op,
+		operand: operand,
 	}
 }
 
@@ -24,8 +24,8 @@ func (b *BoundUnaryExpression) Type() reflect.Type {
 	return b.operand.Type()
 }
 
-func (b *BoundUnaryExpression) OperatorKind() boundUnaryOperatorKind {
-	return b.operatorKind
+func (b *BoundUnaryExpression) Op() boundUnaryOperator {
+	return b.op
 }
 
 func (b *BoundUnaryExpression) Operand() BoundExpression {
