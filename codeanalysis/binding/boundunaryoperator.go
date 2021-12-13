@@ -9,10 +9,10 @@ import (
 
 var (
 	unaryOperators []boundUnaryOperator = []boundUnaryOperator{
-		*newBoundUnaryOperatorWithSameType(syntax.BangToken, LogicalNegation, reflect.TypeOf(true)),
+		*newBoundUnaryOperator(syntax.BangToken, LogicalNegation, reflect.TypeOf(true)),
 
-		*newBoundUnaryOperatorWithSameType(syntax.PlusToken, Identity, reflect.TypeOf(0)),
-		*newBoundUnaryOperatorWithSameType(syntax.MinusToken, Negation, reflect.TypeOf(0)),
+		*newBoundUnaryOperator(syntax.PlusToken, Identity, reflect.TypeOf(0)),
+		*newBoundUnaryOperator(syntax.MinusToken, Negation, reflect.TypeOf(0)),
 	}
 )
 
@@ -23,11 +23,11 @@ type boundUnaryOperator struct {
 	resultType  reflect.Type
 }
 
-func newBoundUnaryOperatorWithSameType(syntaxKind syntax.SyntaxKind, kind boundUnaryOperatorKind, operandType reflect.Type) *boundUnaryOperator {
-	return newBoundUnaryOperator(syntaxKind, kind, operandType, operandType)
+func newBoundUnaryOperator(syntaxKind syntax.SyntaxKind, kind boundUnaryOperatorKind, operandType reflect.Type) *boundUnaryOperator {
+	return newBoundUnaryOperatorWithDifferentTypes(syntaxKind, kind, operandType, operandType)
 }
 
-func newBoundUnaryOperator(syntaxKind syntax.SyntaxKind, kind boundUnaryOperatorKind, operandType reflect.Type, resultType reflect.Type) *boundUnaryOperator {
+func newBoundUnaryOperatorWithDifferentTypes(syntaxKind syntax.SyntaxKind, kind boundUnaryOperatorKind, operandType reflect.Type, resultType reflect.Type) *boundUnaryOperator {
 	return &boundUnaryOperator{
 		syntaxKind:  syntaxKind,
 		kind:        kind,

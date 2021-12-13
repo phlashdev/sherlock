@@ -103,8 +103,6 @@ func (l *lexer) Lex() SyntaxToken {
 		token = NewSyntaxToken(OpenParenthesisToken, l.position, "(", nil)
 	case ')':
 		token = NewSyntaxToken(CloseParenthesisToken, l.position, ")", nil)
-	case '!':
-		token = NewSyntaxToken(BangToken, l.position, "!", nil)
 	case '&':
 		if l.lookahead() == '&' {
 			token = NewSyntaxToken(AmpersandAmpersandToken, l.position, "&&", nil)
@@ -112,6 +110,16 @@ func (l *lexer) Lex() SyntaxToken {
 	case '|':
 		if l.lookahead() == '|' {
 			token = NewSyntaxToken(PipePipeToken, l.position, "||", nil)
+		}
+	case '=':
+		if l.lookahead() == '=' {
+			token = NewSyntaxToken(EqualsEqualsToken, l.position, "==", nil)
+		}
+	case '!':
+		if l.lookahead() == '=' {
+			token = NewSyntaxToken(BangEqualsToken, l.position, "!=", nil)
+		} else {
+			token = NewSyntaxToken(BangToken, l.position, "!", nil)
 		}
 	}
 
@@ -122,9 +130,10 @@ func (l *lexer) Lex() SyntaxToken {
 		token = NewSyntaxToken(BadToken, l.position, text, nil)
 	}
 
-	if token.kind == AmpersandAmpersandToken || token.kind == PipePipeToken {
+	switch token.kind {
+	case AmpersandAmpersandToken, PipePipeToken, EqualsEqualsToken, BangEqualsToken:
 		l.position += 2
-	} else {
+	default:
 		l.position++
 	}
 

@@ -22,8 +22,8 @@ func (b *BoundBinaryExpression) Kind() boundNodeKind {
 	return BinaryExpression
 }
 
-func (b *BoundBinaryExpression) Type() reflect.Type {
-	return b.left.Type()
+func (b *BoundBinaryExpression) ResultType() reflect.Type {
+	return b.op.resultType
 }
 
 func (b *BoundBinaryExpression) Left() BoundExpression {

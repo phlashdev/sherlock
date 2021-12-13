@@ -6,5 +6,5 @@ import (
 
 type BoundExpression interface {
 	boundNode
-	Type() reflect.Type
+	ResultType() reflect.Type
 }

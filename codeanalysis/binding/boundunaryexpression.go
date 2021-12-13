@@ -20,8 +20,8 @@ func (b *BoundUnaryExpression) Kind() boundNodeKind {
 	return UnaryExpression
 }
 
-func (b *BoundUnaryExpression) Type() reflect.Type {
-	return b.operand.Type()
+func (b *BoundUnaryExpression) ResultType() reflect.Type {
+	return b.op.resultType
 }
 
 func (b *BoundUnaryExpression) Op() boundUnaryOperator {

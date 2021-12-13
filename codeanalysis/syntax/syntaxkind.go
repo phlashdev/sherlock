@@ -15,6 +15,8 @@ const (
 	BangToken               SyntaxKind = "BangToken"
 	AmpersandAmpersandToken SyntaxKind = "AmpersandAmpersandToken"
 	PipePipeToken           SyntaxKind = "PipePipeToken"
+	EqualsEqualsToken       SyntaxKind = "EqualsEqualsToken"
+	BangEqualsToken         SyntaxKind = "BangEqualstoken"
 	OpenParenthesisToken    SyntaxKind = "OpenParenthesisToken"
 	CloseParenthesisToken   SyntaxKind = "CloseParenthesisToken"
 	IdentifierToken         SyntaxKind = "IdentifierToken"

@@ -45,9 +45,9 @@ func (b *binder) bindUnaryExpression(expressionSyntax syntax.UnaryExpressionSynt
 	boundOperand := b.BindExpression(expressionSyntax.Operand())
 	operatorToken := expressionSyntax.OperatorToken()
 
-	boundOperator, err := bindUnaryOperator(operatorToken.Kind(), boundOperand.Type())
+	boundOperator, err := bindUnaryOperator(operatorToken.Kind(), boundOperand.ResultType())
 	if err != nil {
-		message := fmt.Sprintf("Unary operator %q is not defined for type %v", operatorToken.Text(), boundOperand.Type())
+		message := fmt.Sprintf("Unary operator %q is not defined for type %v", operatorToken.Text(), boundOperand.ResultType())
 		b.diagnostics = append(b.diagnostics, message)
 		return boundOperand
 	}
@@ -60,9 +60,9 @@ func (b *binder) bindBinaryExpression(expressionSyntax syntax.BinaryExpressionSy
 	boundRight := b.BindExpression(expressionSyntax.Right())
 	operatorToken := expressionSyntax.OperatorToken()
 
-	boundOperator, err := bindBinaryOperator(operatorToken.Kind(), boundLeft.Type(), boundRight.Type())
+	boundOperator, err := bindBinaryOperator(operatorToken.Kind(), boundLeft.ResultType(), boundRight.ResultType())
 	if err != nil {
-		message := fmt.Sprintf("Binary operator %q is not defined for types %v and %v", operatorToken.Text(), boundLeft.Type(), boundRight.Type())
+		message := fmt.Sprintf("Binary operator %q is not defined for types %v and %v", operatorToken.Text(), boundLeft.ResultType(), boundRight.ResultType())
 		b.diagnostics = append(b.diagnostics, message)
 		return boundLeft
 	}

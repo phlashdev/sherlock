@@ -57,6 +57,10 @@ func (e *Evaluator) evaluateExpression(node binding.BoundExpression) interface{}
 			return left.(bool) && right.(bool)
 		case binding.LogicalOr:
 			return left.(bool) || right.(bool)
+		case binding.Equals:
+			return left == right
+		case binding.NotEquals:
+			return left != right
 		default:
 			panic(fmt.Sprintf("Unexcpected binary operator %v", op))
 		}

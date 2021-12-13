@@ -16,7 +16,7 @@ func (b *BoundLiteralExpression) Kind() boundNodeKind {
 	return LiteralExpression
 }
 
-func (b *BoundLiteralExpression) Type() reflect.Type {
+func (b *BoundLiteralExpression) ResultType() reflect.Type {
 	return reflect.TypeOf(b.value)
 }
 
