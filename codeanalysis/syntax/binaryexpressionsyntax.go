@@ -1,4 +1,4 @@
-package codeanalysis
+package syntax
 
 type BinaryExpressionSyntax struct {
 	left          ExpressionSyntax

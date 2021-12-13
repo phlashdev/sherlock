@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/phlashdev/sherlock/codeanalysis"
+	"github.com/phlashdev/sherlock/codeanalysis/binding"
+	"github.com/phlashdev/sherlock/codeanalysis/syntax"
 )
 
 type ConsoleColor string
@@ -44,7 +46,11 @@ func main() {
 			continue
 		}
 
-		syntaxTree := codeanalysis.Parse(line)
+		syntaxTree := syntax.Parse(line)
+		binder := binding.NewBinder()
+		boundExpression := binder.BindExpression(syntaxTree.Root())
+
+		diagnostics := append(syntaxTree.Diagnostics(), binder.Diagnostics()...)
 
 		if showTree {
 			fmt.Print(ColorGray)
@@ -52,14 +58,14 @@ func main() {
 			fmt.Print(ColorReset)
 		}
 
-		if len(syntaxTree.Diagnostics()) == 0 {
-			e := codeanalysis.NewEvaluator(syntaxTree.Root())
+		if len(diagnostics) == 0 {
+			e := codeanalysis.NewEvaluator(boundExpression)
 			result := e.Evaluate()
 			fmt.Println(result)
 		} else {
 			fmt.Print(ColorRed)
 
-			for _, diagnostic := range syntaxTree.Diagnostics() {
+			for _, diagnostic := range diagnostics {
 				fmt.Println(diagnostic)
 			}
 
@@ -68,7 +74,7 @@ func main() {
 	}
 }
 
-func prettyPrint(node codeanalysis.SyntaxNode, indent string, isLast bool) {
+func prettyPrint(node syntax.SyntaxNode, indent string, isLast bool) {
 	var marker string
 	if isLast {
 		marker = "└── "
@@ -78,7 +84,7 @@ func prettyPrint(node codeanalysis.SyntaxNode, indent string, isLast bool) {
 
 	fmt.Printf("%s%s%v", indent, marker, node.Kind())
 
-	if t, ok := node.(*codeanalysis.SyntaxToken); ok && t.Value() != nil {
+	if t, ok := node.(*syntax.SyntaxToken); ok && t.Value() != nil {
 		fmt.Printf(" %v", t.Value())
 	}
 

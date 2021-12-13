@@ -1,4 +1,4 @@
-package codeanalysis
+package syntax
 
 type SyntaxToken struct {
 	kind     SyntaxKind
