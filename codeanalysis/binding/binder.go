@@ -29,6 +29,9 @@ func (b *binder) BindExpression(expressionSyntax syntax.ExpressionSyntax) BoundE
 	case syntax.BinaryExpression:
 		binary, _ := expressionSyntax.(*syntax.BinaryExpressionSyntax)
 		return b.bindBinaryExpression(*binary)
+	case syntax.ParenthesizedExpression:
+		parenthesized, _ := expressionSyntax.(*syntax.ParenthesizedExpressionSyntax)
+		return b.BindExpression(parenthesized.Expression())
 	default:
 		panic(fmt.Sprintf("Unexpected syntax %v", expressionSyntax.Kind()))
 	}
