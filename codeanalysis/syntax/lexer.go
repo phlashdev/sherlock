@@ -1,16 +1,18 @@
 package syntax
 
 import (
-	"fmt"
+	"reflect"
 	"strconv"
 	"unicode"
+
+	"github.com/phlashdev/sherlock/codeanalysis/diagnostic"
 )
 
 type lexer struct {
 	text        string
 	runes       []rune
 	position    int
-	diagnostics []string
+	diagnostics []diagnostic.Diagnostic
 }
 
 func NewLexer(text string) *lexer {
@@ -20,7 +22,7 @@ func NewLexer(text string) *lexer {
 	}
 }
 
-func (l *lexer) Diagnostics() []string {
+func (l *lexer) Diagnostics() []diagnostic.Diagnostic {
 	return l.diagnostics
 }
 
@@ -51,9 +53,9 @@ func (l *lexer) Lex() SyntaxToken {
 		return *NewSyntaxToken(EndOfFileToken, l.position, string(rune(0)), nil)
 	}
 
-	if unicode.IsDigit(l.current()) {
-		start := l.position
+	start := l.position
 
+	if unicode.IsDigit(l.current()) {
 		for unicode.IsDigit(l.current()) {
 			l.next()
 		}
@@ -61,14 +63,15 @@ func (l *lexer) Lex() SyntaxToken {
 		text := string(l.runes[start:l.position])
 		value, err := strconv.Atoi(text)
 		if err != nil {
-			l.diagnostics = append(l.diagnostics, fmt.Sprintf("The number %v isn't valid int", value))
+			length := l.position - start
+			span := *diagnostic.NewTextSpan(start, length)
+			report := reportInvalidNumber(span, l.text, reflect.TypeOf(0))
+			l.diagnostics = append(l.diagnostics, report)
 		}
 		return *NewSyntaxToken(NumberToken, start, text, value)
 	}
 
 	if unicode.IsSpace(l.current()) {
-		start := l.position
-
 		for unicode.IsSpace(l.current()) {
 			l.next()
 		}
@@ -78,8 +81,6 @@ func (l *lexer) Lex() SyntaxToken {
 	}
 
 	if unicode.IsLetter(l.current()) {
-		start := l.position
-
 		for unicode.IsLetter(l.current()) {
 			l.next()
 		}
@@ -124,7 +125,8 @@ func (l *lexer) Lex() SyntaxToken {
 	}
 
 	if token == nil {
-		l.diagnostics = append(l.diagnostics, fmt.Sprintf("ERROR: bad character input: %q", l.current()))
+		report := reportBadCharacter(l.position, l.current())
+		l.diagnostics = append(l.diagnostics, report)
 
 		text := string(l.runes[l.position])
 		token = NewSyntaxToken(BadToken, l.position, text, nil)

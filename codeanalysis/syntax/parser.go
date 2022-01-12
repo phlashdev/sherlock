@@ -1,13 +1,13 @@
 package syntax
 
 import (
-	"fmt"
+	"github.com/phlashdev/sherlock/codeanalysis/diagnostic"
 )
 
 type parser struct {
 	tokens      []SyntaxToken
 	position    int
-	diagnostics []string
+	diagnostics []diagnostic.Diagnostic
 }
 
 func NewParser(text string) *parser {
@@ -33,7 +33,7 @@ func NewParser(text string) *parser {
 	return &parser
 }
 
-func (p *parser) Diagnostics() []string {
+func (p *parser) Diagnostics() []diagnostic.Diagnostic {
 	return p.diagnostics
 }
 
@@ -62,7 +62,7 @@ func (p *parser) matchToken(kind SyntaxKind) SyntaxToken {
 		return p.nextToken()
 	}
 
-	p.diagnostics = append(p.diagnostics, fmt.Sprintf("ERROR: Unexpected token <%v>, expected <%v>", current.kind, kind))
+	p.diagnostics = append(p.diagnostics, reportUnexpectedToken(current.Span(), current.Kind(), kind))
 	return *NewSyntaxToken(kind, current.Position(), "", nil)
 }
 

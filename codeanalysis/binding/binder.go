@@ -3,18 +3,19 @@ package binding
 import (
 	"fmt"
 
+	"github.com/phlashdev/sherlock/codeanalysis/diagnostic"
 	"github.com/phlashdev/sherlock/codeanalysis/syntax"
 )
 
 type binder struct {
-	diagnostics []string
+	diagnostics []diagnostic.Diagnostic
 }
 
 func NewBinder() *binder {
 	return &binder{}
 }
 
-func (b *binder) Diagnostics() []string {
+func (b *binder) Diagnostics() []diagnostic.Diagnostic {
 	return b.diagnostics
 }
 
@@ -50,8 +51,8 @@ func (b *binder) bindUnaryExpression(expressionSyntax syntax.UnaryExpressionSynt
 
 	boundOperator, err := bindUnaryOperator(operatorToken.Kind(), boundOperand.ResultType())
 	if err != nil {
-		message := fmt.Sprintf("Unary operator %q is not defined for type %v", operatorToken.Text(), boundOperand.ResultType())
-		b.diagnostics = append(b.diagnostics, message)
+		report := reportUndefinedUnaryOperator(operatorToken.Span(), operatorToken.Text(), boundOperand.ResultType())
+		b.diagnostics = append(b.diagnostics, report)
 		return boundOperand
 	}
 
@@ -65,8 +66,8 @@ func (b *binder) bindBinaryExpression(expressionSyntax syntax.BinaryExpressionSy
 
 	boundOperator, err := bindBinaryOperator(operatorToken.Kind(), boundLeft.ResultType(), boundRight.ResultType())
 	if err != nil {
-		message := fmt.Sprintf("Binary operator %q is not defined for types %v and %v", operatorToken.Text(), boundLeft.ResultType(), boundRight.ResultType())
-		b.diagnostics = append(b.diagnostics, message)
+		report := reportUndefinedBinaryOperator(operatorToken.Span(), operatorToken.Text(), boundLeft.ResultType(), boundRight.ResultType())
+		b.diagnostics = append(b.diagnostics, report)
 		return boundLeft
 	}
 

@@ -1,5 +1,7 @@
 package syntax
 
+import "github.com/phlashdev/sherlock/codeanalysis/diagnostic"
+
 type SyntaxToken struct {
 	kind     SyntaxKind
 	position int
@@ -30,6 +32,10 @@ func (t *SyntaxToken) Text() string {
 
 func (t *SyntaxToken) Value() interface{} {
 	return t.value
+}
+
+func (t *SyntaxToken) Span() diagnostic.TextSpan {
+	return *diagnostic.NewTextSpan(t.position, len(t.text))
 }
 
 func (t *SyntaxToken) GetChildren() []SyntaxNode {

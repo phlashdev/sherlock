@@ -1,12 +1,14 @@
 package syntax
 
+import "github.com/phlashdev/sherlock/codeanalysis/diagnostic"
+
 type SyntaxTree struct {
-	diagnostics    []string
+	diagnostics    []diagnostic.Diagnostic
 	root           ExpressionSyntax
 	endOfFileToken SyntaxToken
 }
 
-func NewSyntaxTree(diagnostics []string, root ExpressionSyntax, endOfFileToken SyntaxToken) *SyntaxTree {
+func NewSyntaxTree(diagnostics []diagnostic.Diagnostic, root ExpressionSyntax, endOfFileToken SyntaxToken) *SyntaxTree {
 	return &SyntaxTree{
 		diagnostics:    diagnostics,
 		root:           root,
@@ -14,7 +16,7 @@ func NewSyntaxTree(diagnostics []string, root ExpressionSyntax, endOfFileToken S
 	}
 }
 
-func (s *SyntaxTree) Diagnostics() []string {
+func (s *SyntaxTree) Diagnostics() []diagnostic.Diagnostic {
 	return s.diagnostics
 }
 

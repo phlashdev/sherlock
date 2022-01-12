@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/phlashdev/sherlock/codeanalysis"
-	"github.com/phlashdev/sherlock/codeanalysis/binding"
+	"github.com/phlashdev/sherlock/codeanalysis/compilation"
 	"github.com/phlashdev/sherlock/codeanalysis/syntax"
 )
 
@@ -47,10 +46,10 @@ func main() {
 		}
 
 		syntaxTree := syntax.Parse(line)
-		binder := binding.NewBinder()
-		boundExpression := binder.BindExpression(syntaxTree.Root())
+		compilation := compilation.NewCompilation(syntaxTree)
+		result := compilation.Evaluate()
 
-		diagnostics := append(syntaxTree.Diagnostics(), binder.Diagnostics()...)
+		diagnostics := result.Diagnostics()
 
 		if showTree {
 			fmt.Print(ColorGray)
@@ -59,17 +58,30 @@ func main() {
 		}
 
 		if len(diagnostics) == 0 {
-			e := codeanalysis.NewEvaluator(boundExpression)
-			result := e.Evaluate()
-			fmt.Println(result)
+			fmt.Println(result.Value())
 		} else {
-			fmt.Print(ColorRed)
-
 			for _, diagnostic := range diagnostics {
-				fmt.Println(diagnostic)
-			}
+				fmt.Println()
 
-			fmt.Print(ColorReset)
+				fmt.Print(ColorRed)
+				fmt.Println(diagnostic)
+
+				span := diagnostic.Span()
+				prefix := line[0:span.Start()]
+				err := line[span.Start():span.Length()]
+				suffix := line[span.End():]
+
+				fmt.Print("    ")
+				fmt.Print(prefix)
+
+				fmt.Print(ColorRed)
+				fmt.Print(err)
+				fmt.Print(ColorReset)
+
+				fmt.Print(suffix)
+
+				fmt.Println()
+			}
 		}
 	}
 }
